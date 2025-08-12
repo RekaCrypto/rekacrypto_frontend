@@ -1,4 +1,5 @@
 import CoinFilter from '@/components/CoinFilter'
+import CryptoTicker from '@/components/CryptoTicker'
 import DateFilter from '@/components/DateFilter'
 import NewsTimeline from '@/components/NewsTimeline'
 import SearchForm from '@/components/SearchForm'
@@ -25,7 +26,7 @@ async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight">Reka Crypto News</h1>
+      <CryptoTicker coins={coins} />
 
       <SearchForm 
         search={search}
