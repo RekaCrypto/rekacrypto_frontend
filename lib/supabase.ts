@@ -6,7 +6,7 @@ export type CryptoRecap = {
   forecast_indicator: 'bullish' | 'bearish' | 'neutral'
   description: string
   sources: string[]
-  coin: string // shortname the recap relates to
+  coin: string
   created_at: string
   updated_at: string
 }
@@ -37,7 +37,7 @@ export function getSupabaseServer() {
 export type DateRange = 'today' | 'week' | 'month' | 'year'
 
 export async function fetchCryptoRecaps(params: {
-  coins?: string[] // list of shortnames
+  coins?: string[]
   search?: string
   date?: DateRange
   limit?: number
@@ -52,7 +52,16 @@ export async function fetchCryptoRecaps(params: {
     .limit(limit)
 
   if (coins && coins.length > 0) {
-    query = query.in('coin', coins)
+    const coinsData = await fetchCoins()
+    const shortNameToFullName = new Map(coinsData.map(coin => [coin.shortname, coin.name]))
+    
+    const fullNames = coins
+      .map(shortname => shortNameToFullName.get(shortname))
+      .filter(Boolean)
+    
+    if (fullNames.length > 0) {
+      query = query.in('coin', fullNames)
+    }
   }
 
   if (search?.trim()) {
@@ -70,7 +79,6 @@ export async function fetchCryptoRecaps(params: {
         startDate.setHours(0, 0, 0, 0)
         break
       case 'week':
-        // Get start of current week (Monday)
         const dayOfWeek = now.getDay()
         const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
         startDate = new Date(now)

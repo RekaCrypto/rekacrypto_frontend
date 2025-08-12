@@ -10,9 +10,6 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
   return (
     <li className="card p-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs text-slate-400">
-          {new Date(recap.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </span>
         <span
           className={classNames(
             'badge ring-white/10',

@@ -21,8 +21,6 @@ async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
   ])
 
   const coinMap = new Map(coins.map((c) => [c.shortname, c]))
-  const currentShortnames = new Set(coins.map((c) => c.shortname))
-  const extraSelected = (selectedCoins || []).filter((sn) => !currentShortnames.has(sn))
   const { grouped, dayKeys } = groupRecapsByDay(recaps)
 
   return (
@@ -44,7 +42,6 @@ async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
       <CoinFilter 
         coins={coins}
         selectedCoins={selectedCoins}
-        extraSelected={extraSelected}
         search={search}
         date={date}
       />

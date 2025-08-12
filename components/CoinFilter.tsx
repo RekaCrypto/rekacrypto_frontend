@@ -4,7 +4,6 @@ import { buildHref, CHIP_STYLES, classNames, toggleCoin } from '@/lib/utils'
 type CoinFilterProps = {
   coins: CryptoCoin[]
   selectedCoins?: string[]
-  extraSelected: string[]
   search?: string
   date?: 'today' | 'week' | 'month' | 'year'
 }
@@ -35,30 +34,9 @@ function CoinChip({
   )
 }
 
-function ExtraCoinChip({ 
-  shortname, 
-  href 
-}: { 
-  shortname: string; 
-  href: string 
-}) {
-  return (
-    <a
-      href={href}
-      className={classNames(CHIP_STYLES.base, CHIP_STYLES.active)}
-    >
-      <span className="inline-flex items-center gap-2">
-        <span className="h-4 w-4 rounded-full bg-gradient-to-br from-primary-500 to-fuchsia-500 inline-block" />
-        <span className="uppercase">{shortname}</span>
-      </span>
-    </a>
-  )
-}
-
 export default function CoinFilter({ 
   coins, 
   selectedCoins, 
-  extraSelected, 
   search, 
   date 
 }: CoinFilterProps) {
@@ -83,19 +61,6 @@ export default function CoinFilter({
             key={coin.id}
             coin={coin}
             isActive={isActive}
-            href={href}
-          />
-        )
-      })}
-      
-      {extraSelected.map((shortname) => {
-        const nextCoins = toggleCoin(selectedCoins || [], shortname)
-        const href = buildHref({ coins: nextCoins, search, date })
-        
-        return (
-          <ExtraCoinChip
-            key={`extra-${shortname}`}
-            shortname={shortname}
             href={href}
           />
         )
