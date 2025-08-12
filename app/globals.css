@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+.container {
+  width: 100%;
+}
+
+/* Simple card styles */
+.card {
+  @apply rounded-xl border border-white/10 bg-white/5 shadow-lg shadow-black/30 backdrop-blur-sm;
+}
+
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset;
+}
+
+.input {
+  @apply w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500/60;
+}
+
+.select {
+  @apply rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/60;
+}
+
+.button {
+  @apply inline-flex items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-sm font-medium text-white hover:bg-primary-500 transition-colors;
+}

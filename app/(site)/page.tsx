@@ -1,0 +1,79 @@
+import CoinFilter from '@/components/CoinFilter'
+import DateFilter from '@/components/DateFilter'
+import NewsTimeline from '@/components/NewsTimeline'
+import SearchForm from '@/components/SearchForm'
+import { fetchCoins, fetchCryptoRecaps } from '@/lib/supabase'
+import { groupRecapsByDay, parseCoinsParam } from '@/lib/utils'
+import { Suspense } from 'react'
+
+export const dynamic = 'force-dynamic'
+
+type NewsListProps = {
+  coins?: string[]
+  search?: string
+  date?: 'today' | 'week' | 'month' | 'year'
+}
+
+async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
+  const [coins, recaps] = await Promise.all([
+    fetchCoins(),
+    fetchCryptoRecaps({ coins: selectedCoins, search, date, limit: 200 }),
+  ])
+
+  const coinMap = new Map(coins.map((c) => [c.shortname, c]))
+  const currentShortnames = new Set(coins.map((c) => c.shortname))
+  const extraSelected = (selectedCoins || []).filter((sn) => !currentShortnames.has(sn))
+  const { grouped, dayKeys } = groupRecapsByDay(recaps)
+
+  return (
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold tracking-tight">Reka Crypto News</h1>
+
+      <SearchForm 
+        search={search}
+        selectedCoins={selectedCoins}
+        date={date}
+      />
+
+      <DateFilter 
+        selectedCoins={selectedCoins}
+        search={search}
+        currentDate={date}
+      />
+
+      <CoinFilter 
+        coins={coins}
+        selectedCoins={selectedCoins}
+        extraSelected={extraSelected}
+        search={search}
+        date={date}
+      />
+
+      <NewsTimeline 
+        grouped={grouped}
+        dayKeys={dayKeys}
+        coinMap={coinMap}
+      />
+    </div>
+  )
+}
+
+type PageProps = {
+  searchParams: {
+    coins?: string | string[]
+    search?: string
+    date?: 'today' | 'week' | 'month' | 'year'
+  }
+}
+
+export default async function Page({ searchParams }: PageProps) {
+  const coins = parseCoinsParam(searchParams?.coins)
+  const search = searchParams?.search || undefined
+  const date = (searchParams?.date as 'today' | 'week' | 'month' | 'year' | undefined) || undefined
+  
+  return (
+    <Suspense fallback={<div className="text-slate-400">Loading...</div>}>
+      <NewsList coins={coins} search={search} date={date} />
+    </Suspense>
+  )
+}
