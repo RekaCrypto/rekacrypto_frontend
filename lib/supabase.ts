@@ -26,6 +26,11 @@ export function getSupabaseServer() {
   }
   return createClient(url, anonKey, {
     auth: { persistSession: false },
+    global: {
+      headers: {
+        'cache-control': 'no-cache'
+      }
+    }
   })
 }
 
@@ -36,7 +41,7 @@ export async function fetchCryptoRecaps(params: {
   search?: string
   date?: DateRange
   limit?: number
-}) {
+}): Promise<CryptoRecap[]> {
   const { coins, search, date, limit = 50 } = params
   const supabase = getSupabaseServer()
 
@@ -46,67 +51,69 @@ export async function fetchCryptoRecaps(params: {
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (coins && coins.length) {
+  if (coins && coins.length > 0) {
     query = query.in('coin', coins)
   }
 
-  if (search && search.trim()) {
-    const s = `%${search.trim()}%`
-    query = query.or(`summary.ilike.${s},description.ilike.${s}`)
+  if (search?.trim()) {
+    const searchTerm = `%${search.trim()}%`
+    query = query.or(`summary.ilike.${searchTerm},description.ilike.${searchTerm}`)
   }
 
   if (date) {
     const now = new Date()
-    let start = new Date(now)
-    if (date === 'today') {
-      start.setHours(0, 0, 0, 0)
-    } else if (date === 'week') {
-      // Get start of current week (Monday)
-      const dayOfWeek = now.getDay()
-      const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Sunday is 0, make Monday = 0
-      start = new Date(now)
-      start.setDate(now.getDate() - daysFromMonday)
-      start.setHours(0, 0, 0, 0)
-    } else if (date === 'month') {
-      start = new Date(now.getFullYear(), now.getMonth(), 1)
-    } else if (date === 'year') {
-      start = new Date(now.getFullYear(), 0, 1)
+    let startDate: Date
+
+    switch (date) {
+      case 'today':
+        startDate = new Date(now)
+        startDate.setHours(0, 0, 0, 0)
+        break
+      case 'week':
+        // Get start of current week (Monday)
+        const dayOfWeek = now.getDay()
+        const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+        startDate = new Date(now)
+        startDate.setDate(now.getDate() - daysFromMonday)
+        startDate.setHours(0, 0, 0, 0)
+        break
+      case 'month':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+        break
+      case 'year':
+        startDate = new Date(now.getFullYear(), 0, 1)
+        break
+      default:
+        throw new Error(`Invalid date range: ${date}`)
     }
-    query = query.gte('created_at', start.toISOString())
+    
+    query = query.gte('created_at', startDate.toISOString())
   }
 
   const { data, error } = await query
-  if (error) throw error
-  return data as CryptoRecap[]
+
+  if (error) {
+    console.error('Error fetching crypto recaps:', error)
+    throw error
+  }
+
+  return data || []
 }
 
 export async function fetchCoins(): Promise<CryptoCoin[]> {
   const supabase = getSupabaseServer()
+  
   const { data, error } = await supabase
     .from('crypto_coins')
     .select('id, shortname, name, image_link')
     .order('shortname', { ascending: true })
-
+    
   if (error) {
-    // Fallback to recaps-derived coins if table is protected or errors
-    return fallbackCoinsFromRecaps(supabase)
+    console.error('Error fetching coins:', error)
+    throw error
   }
 
-  if (!data || data.length === 0) {
-    return fallbackCoinsFromRecaps(supabase)
-  }
-
-  return data as CryptoCoin[]
+  return data || []
 }
 
-async function fallbackCoinsFromRecaps(supabase: ReturnType<typeof getSupabaseServer>): Promise<CryptoCoin[]> {
-  const { data } = await supabase
-    .from('crypto_recaps')
-    .select('coin')
-    .order('coin', { ascending: true })
-    .limit(5000)
 
-  const set = new Set<string>((data as any[])?.map((d) => d.coin).filter(Boolean) ?? [])
-  const list = Array.from(set).sort((a, b) => a.localeCompare(b))
-  return list.map((sn, idx) => ({ id: idx + 1, shortname: sn, name: sn.toUpperCase(), image_link: null }))
-}
