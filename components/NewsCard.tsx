@@ -1,5 +1,6 @@
 import type { CryptoCoin, CryptoRecap } from '@/lib/supabase'
 import { classNames } from '@/lib/utils'
+import ExpandableDescription from './ExpandableDescription'
 
 type NewsCardProps = {
   recap: CryptoRecap
@@ -8,8 +9,28 @@ type NewsCardProps = {
 
 export default function NewsCard({ recap, coin }: NewsCardProps) {
   return (
-    <li className="card p-4">
-      <div className="flex items-center justify-between gap-2">
+    <li className="card p-4 list-none">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          {coin?.image_link ? (
+            <img
+              src={coin.image_link}
+              alt={coin.name}
+              className="h-6 w-6 rounded-full flex-shrink-0"
+            />
+          ) : null}
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm font-medium text-slate-200 truncate">
+              {coin?.name ?? recap.coin}
+            </span>
+            {coin?.shortname ? (
+              <span className="badge bg-white/5 text-slate-300 ring-white/10">
+                {coin.shortname}
+              </span>
+            ) : null}
+          </div>
+        </div>
+
         <span
           className={classNames(
             'badge ring-white/10',
@@ -21,10 +42,14 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
           {recap.forecast_indicator}
         </span>
       </div>
+
+      <h3 className="mt-3 text-base md:text-lg font-semibold text-slate-100">{recap.summary}</h3>
       
-      <h3 className="mt-2 text-lg font-semibold">{recap.summary}</h3>
-      <p className="mt-2 line-clamp-4 text-sm text-slate-300">{recap.description}</p>
-      
+      <ExpandableDescription 
+        text={recap.description} 
+        className="mt-2 text-sm text-slate-300" 
+      />
+
       {recap.sources?.length ? (
         <div className="mt-3 flex flex-wrap gap-2">
           {recap.sources.map((source, i) => (
@@ -39,17 +64,6 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
           ))}
         </div>
       ) : null}
-      
-      <div className="mt-4 flex items-center justify-between">
-        <span className="badge bg-white/5 text-slate-300 ring-white/10 inline-flex items-center gap-2">
-          {coin?.image_link ? (
-            <img src={coin.image_link} alt={recap.coin} className="h-4 w-4 rounded-full" />
-          ) : (
-            <span className="h-4 w-4 rounded-full bg-gradient-to-br from-primary-500 to-fuchsia-500 inline-block" />
-          )}
-          <span className="uppercase">{recap.coin}</span>
-        </span>
-      </div>
     </li>
   )
 }

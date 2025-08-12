@@ -20,7 +20,7 @@ async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
     fetchCryptoRecaps({ coins: selectedCoins, search, date, limit: 200 }),
   ])
 
-  const coinMap = new Map(coins.map((c) => [c.shortname, c]))
+  const coinMap = new Map(coins.map((c) => [c.name, c]))
   const { grouped, dayKeys } = groupRecapsByDay(recaps)
 
   return (
