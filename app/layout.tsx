@@ -1,11 +1,12 @@
-import Header from '@/components/Header'
-import type { Metadata } from 'next'
-import './globals.css'
+import Header from "@/components/Header";
+import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Reka Crypto News',
-  description: 'Curated crypto recaps with filters',
-}
+  title: "Reka Crypto News",
+  description: "Curated crypto recaps with filters",
+};
 
 export default function RootLayout({
   children,
@@ -21,7 +22,8 @@ export default function RootLayout({
           <Header />
           {children}
         </main>
+        <Analytics />
       </body>
     </html>
-  )
+  );
 }
