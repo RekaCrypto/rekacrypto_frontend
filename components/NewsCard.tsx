@@ -1,11 +1,11 @@
-import type { CryptoCoin, CryptoRecap } from '@/lib/supabase'
-import { classNames } from '@/lib/utils'
-import ExpandableDescription from './ExpandableDescription'
+import type { CryptoCoin, CryptoRecap } from "@/lib/supabase";
+import { classNames } from "@/lib/utils";
+import ExpandableDescription from "./ExpandableDescription";
 
 type NewsCardProps = {
-  recap: CryptoRecap
-  coin?: CryptoCoin
-}
+  recap: CryptoRecap;
+  coin?: CryptoCoin;
+};
 
 export default function NewsCard({ recap, coin }: NewsCardProps) {
   return (
@@ -31,23 +31,44 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
           </div>
         </div>
 
-        <span
-          className={classNames(
-            'badge ring-white/10',
-            recap.forecast_indicator === 'bullish' && 'bg-emerald-500/10 text-emerald-300',
-            recap.forecast_indicator === 'bearish' && 'bg-rose-500/10 text-rose-300',
-            recap.forecast_indicator === 'neutral' && 'bg-amber-500/10 text-amber-300',
-          )}
-        >
-          {recap.forecast_indicator}
-        </span>
+        <div className="flex items-center gap-2.5 min-w-[100px]">
+          <div className="flex-1 h-2 bg-slate-700/30 rounded-full overflow-hidden">
+            <div
+              className={classNames(
+                "h-full rounded-full transition-all",
+                recap.forecast_indicator >= 7 &&
+                  "bg-gradient-to-r from-emerald-500 to-emerald-400",
+                recap.forecast_indicator >= 4 &&
+                  recap.forecast_indicator < 7 &&
+                  "bg-gradient-to-r from-amber-500 to-amber-400",
+                recap.forecast_indicator < 4 &&
+                  "bg-gradient-to-r from-rose-500 to-rose-400"
+              )}
+              style={{ width: `${recap.forecast_indicator * 10}%` }}
+            />
+          </div>
+          <span
+            className={classNames(
+              "text-sm font-semibold tabular-nums min-w-[1.25rem] text-right",
+              recap.forecast_indicator >= 7 && "text-emerald-300",
+              recap.forecast_indicator >= 4 &&
+                recap.forecast_indicator < 7 &&
+                "text-amber-300",
+              recap.forecast_indicator < 4 && "text-rose-300"
+            )}
+          >
+            {recap.forecast_indicator}
+          </span>
+        </div>
       </div>
 
-      <h3 className="mt-3 text-base md:text-lg font-semibold text-slate-100">{recap.summary}</h3>
-      
-      <ExpandableDescription 
-        text={recap.description} 
-        className="mt-2 text-sm text-slate-300" 
+      <h3 className="mt-3 text-base md:text-lg font-semibold text-slate-100">
+        {recap.summary}
+      </h3>
+
+      <ExpandableDescription
+        text={recap.description}
+        className="mt-2 text-sm text-slate-300"
       />
 
       {recap.sources?.length ? (
@@ -65,5 +86,5 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
         </div>
       ) : null}
     </li>
-  )
+  );
 }
