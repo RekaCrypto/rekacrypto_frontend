@@ -23,7 +23,7 @@ export function getSupabaseServer() {
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!url || !anonKey) {
     throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
     );
   }
   return createClient(url, anonKey, {
@@ -56,7 +56,7 @@ export async function fetchCryptoRecaps(params: {
   if (coins && coins.length > 0) {
     const coinsData = await fetchCoins();
     const shortNameToFullName = new Map(
-      coinsData.map((coin) => [coin.shortname, coin.name])
+      coinsData.map((coin) => [coin.shortname, coin.name]),
     );
 
     const fullNames = coins
@@ -71,7 +71,7 @@ export async function fetchCryptoRecaps(params: {
   if (search?.trim()) {
     const searchTerm = `%${search.trim()}%`;
     query = query.or(
-      `summary.ilike.${searchTerm},description.ilike.${searchTerm}`
+      `summary.ilike.${searchTerm},description.ilike.${searchTerm}`,
     );
   }
 
