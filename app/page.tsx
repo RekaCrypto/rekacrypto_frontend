@@ -1,8 +1,4 @@
-import CoinFilter from "@/components/CoinFilter";
-import CryptoTicker from "@/components/CryptoTicker";
-import DateFilter from "@/components/DateFilter";
 import NewsTimeline from "@/components/NewsTimeline";
-import SearchForm from "@/components/SearchForm";
 import { fetchCoins, fetchCryptoRecaps } from "@/lib/supabase";
 import { groupRecapsByDay, parseCoinsParam } from "@/lib/utils";
 import { Suspense } from "react";
@@ -26,23 +22,18 @@ async function NewsList({ coins: selectedCoins, search, date }: NewsListProps) {
 
   return (
     <div className="space-y-6">
-      <CryptoTicker coins={coins} />
-
-      <SearchForm search={search} selectedCoins={selectedCoins} date={date} />
-
+      {/* <SearchForm search={search} selectedCoins={selectedCoins} date={date} />
       <DateFilter
         selectedCoins={selectedCoins}
         search={search}
         currentDate={date}
       />
-
       <CoinFilter
         coins={coins}
         selectedCoins={selectedCoins}
         search={search}
         date={date}
-      />
-
+      /> */}
       <NewsTimeline grouped={grouped} dayKeys={dayKeys} coinMap={coinMap} />
     </div>
   );

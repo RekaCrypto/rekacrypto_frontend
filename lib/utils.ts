@@ -65,13 +65,6 @@ export function groupRecapsByDay(recaps: any[]) {
   return { grouped, dayKeys };
 }
 
-// Utility for class names
-export function classNames(
-  ...cls: (string | false | null | undefined)[]
-): string {
-  return cls.filter(Boolean).join(" ");
-}
-
 // Chip styling constants
 export const CHIP_STYLES = {
   base: "badge cursor-pointer select-none transition-colors",

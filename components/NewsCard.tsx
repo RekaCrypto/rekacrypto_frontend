@@ -1,5 +1,5 @@
 import type { CryptoCoin, CryptoRecap } from "@/lib/supabase";
-import { classNames } from "@/lib/utils";
+import clsx from "clsx";
 import ExpandableDescription from "./ExpandableDescription";
 
 type NewsCardProps = {
@@ -34,7 +34,7 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
         <div className="flex items-center gap-2.5 min-w-[100px]">
           <div className="flex-1 h-2 bg-slate-700/30 rounded-full overflow-hidden">
             <div
-              className={classNames(
+              className={clsx(
                 "h-full rounded-full transition-all",
                 recap.forecast_indicator >= 7 &&
                   "bg-gradient-to-r from-emerald-500 to-emerald-400",
@@ -42,19 +42,19 @@ export default function NewsCard({ recap, coin }: NewsCardProps) {
                   recap.forecast_indicator < 7 &&
                   "bg-gradient-to-r from-amber-500 to-amber-400",
                 recap.forecast_indicator < 4 &&
-                  "bg-gradient-to-r from-rose-500 to-rose-400"
+                  "bg-gradient-to-r from-rose-500 to-rose-400",
               )}
               style={{ width: `${recap.forecast_indicator * 10}%` }}
             />
           </div>
           <span
-            className={classNames(
+            className={clsx(
               "text-sm font-semibold tabular-nums min-w-[1.25rem] text-right",
               recap.forecast_indicator >= 7 && "text-emerald-300",
               recap.forecast_indicator >= 4 &&
                 recap.forecast_indicator < 7 &&
                 "text-amber-300",
-              recap.forecast_indicator < 4 && "text-rose-300"
+              recap.forecast_indicator < 4 && "text-rose-300",
             )}
           >
             {recap.forecast_indicator}
