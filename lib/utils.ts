@@ -40,31 +40,6 @@ export function toggleCoin(current: string[], coin: string): string[] {
     : [...current, coin];
 }
 
-// Format date label for display
-export function formatDateLabel(dateKey: string): string {
-  const todayKey = new Date().toISOString().slice(0, 10);
-  if (dateKey === todayKey) return "Today";
-  const d = new Date(dateKey + "T00:00:00");
-  return d.toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-// Group recaps by day
-export function groupRecapsByDay(recaps: any[]) {
-  const grouped: Record<string, typeof recaps> = {};
-  for (const r of recaps) {
-    const key = new Date(r.created_at).toISOString().slice(0, 10);
-    grouped[key] = grouped[key] || [];
-    grouped[key].push(r);
-  }
-  const dayKeys = Object.keys(grouped).sort((a, b) => (a < b ? 1 : -1));
-  return { grouped, dayKeys };
-}
-
 // Chip styling constants
 export const CHIP_STYLES = {
   base: "badge cursor-pointer select-none transition-colors",

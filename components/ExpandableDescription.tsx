@@ -3,10 +3,10 @@
 import clsx from "clsx";
 import { useState } from "react";
 
-type ExpandableDescriptionProps = {
+interface ExpandableDescriptionProps {
   text: string;
   className?: string;
-};
+}
 
 export default function ExpandableDescription({
   text,
@@ -18,7 +18,6 @@ export default function ExpandableDescription({
   return (
     <>
       <p className={clsx(className, !expanded && "line-clamp-4")}>{text}</p>
-
       {needsExpand && (
         <button
           onClick={() => setExpanded(!expanded)}

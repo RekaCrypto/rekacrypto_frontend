@@ -2,11 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 
 export type CryptoRecap = {
   id: number;
+  title: string;
   summary: string;
-  forecast_indicator: number; // 0-10 scale
+  forecast_indicator: number;
   description: string;
   sources: string[];
-  coin: string;
+  coin: CryptoCoin;
   created_at: string;
   updated_at: string;
 };
@@ -36,87 +37,11 @@ export function getSupabaseServer() {
   });
 }
 
+const supabase = getSupabaseServer();
+
 export type DateRange = "today" | "week" | "month" | "year";
 
-export async function fetchCryptoRecaps(params: {
-  coins?: string[];
-  search?: string;
-  date?: DateRange;
-  limit?: number;
-}): Promise<CryptoRecap[]> {
-  const { coins, search, date, limit = 50 } = params;
-  const supabase = getSupabaseServer();
-
-  let query = supabase
-    .from("crypto_recaps")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-
-  if (coins && coins.length > 0) {
-    const coinsData = await fetchCoins();
-    const shortNameToFullName = new Map(
-      coinsData.map((coin) => [coin.shortname, coin.name]),
-    );
-
-    const fullNames = coins
-      .map((shortname) => shortNameToFullName.get(shortname))
-      .filter(Boolean);
-
-    if (fullNames.length > 0) {
-      query = query.in("coin", fullNames);
-    }
-  }
-
-  if (search?.trim()) {
-    const searchTerm = `%${search.trim()}%`;
-    query = query.or(
-      `summary.ilike.${searchTerm},description.ilike.${searchTerm}`,
-    );
-  }
-
-  if (date) {
-    const now = new Date();
-    let startDate: Date;
-
-    switch (date) {
-      case "today":
-        startDate = new Date(now);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case "week":
-        const dayOfWeek = now.getDay();
-        const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-        startDate = new Date(now);
-        startDate.setDate(now.getDate() - daysFromMonday);
-        startDate.setHours(0, 0, 0, 0);
-        break;
-      case "month":
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        break;
-      case "year":
-        startDate = new Date(now.getFullYear(), 0, 1);
-        break;
-      default:
-        throw new Error(`Invalid date range: ${date}`);
-    }
-
-    query = query.gte("created_at", startDate.toISOString());
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error("Error fetching crypto recaps:", error);
-    throw error;
-  }
-
-  return data || [];
-}
-
 export async function fetchCoins(): Promise<CryptoCoin[]> {
-  const supabase = getSupabaseServer();
-
   const { data, error } = await supabase
     .from("crypto_coins")
     .select("id, shortname, name, image_link")
@@ -128,4 +53,78 @@ export async function fetchCoins(): Promise<CryptoCoin[]> {
   }
 
   return data || [];
+}
+
+export interface FetchCryptoRecapsOptions {
+  limit?: number;
+  coinName?: string;
+  dateRange?: DateRange;
+}
+
+export async function fetchCryptoRecaps(
+  options: FetchCryptoRecapsOptions = {},
+): Promise<CryptoRecap[]> {
+  const { limit = 50, coinName, dateRange } = options;
+
+  let query = supabase
+    .from("crypto_recaps")
+    .select(
+      `
+      id,
+      title,
+      summary,
+      forecast_indicator,
+      description,
+      sources,
+      created_at,
+      updated_at,
+      coin:crypto_coins!crypto_recaps_coin_id_fkey(
+        id,
+        shortname,
+        name,
+        image_link
+      )
+    `,
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  // Filter by coin name if provided
+  // if (coinName) {
+  //   query = query.eq("coin", coinName);
+  // }
+
+  // Filter by date range if provided
+  // if (dateRange) {
+  //   const now = new Date();
+  //   let startDate: Date;
+
+  //   switch (dateRange) {
+  //     case "today":
+  //       startDate = new Date(now.setHours(0, 0, 0, 0));
+  //       break;
+  //     case "week":
+  //       startDate = new Date(now.setDate(now.getDate() - 7));
+  //       break;
+  //     case "month":
+  //       startDate = new Date(now.setMonth(now.getMonth() - 1));
+  //       break;
+  //     case "year":
+  //       startDate = new Date(now.setFullYear(now.getFullYear() - 1));
+  //       break;
+  //   }
+
+  //   query = query.gte("created_at", startDate.toISOString());
+  // }
+
+  const { data, error } = await query;
+
+  await new Promise((res) => setTimeout(res, 1000));
+
+  if (error) {
+    console.error("Error fetching crypto recaps:", error);
+    throw error;
+  }
+
+  return (data as any) || [];
 }
