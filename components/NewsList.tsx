@@ -6,6 +6,8 @@ interface NewsListProps {
   search?: string;
   coin?: string;
   date?: string;
+  sentiment?: string;
+  sort?: string;
 }
 
 function formatDateLabel(dateString: string): string {
@@ -43,8 +45,20 @@ function groupRecapsByDay(
   );
 }
 
-export default async function NewsList({ search, coin, date }: NewsListProps) {
-  const recaps = await fetchCryptoRecaps({ search, coin, date });
+export default async function NewsList({
+  search,
+  coin,
+  date,
+  sentiment,
+  sort,
+}: NewsListProps) {
+  const recaps = await fetchCryptoRecaps({
+    search,
+    coin,
+    date,
+    sentiment,
+    sort,
+  });
 
   if (recaps.length === 0) {
     return (
@@ -97,9 +111,11 @@ export default async function NewsList({ search, coin, date }: NewsListProps) {
   }
 
   const grouped = groupRecapsByDay(recaps);
-  const dayKeys = Object.keys(grouped).sort(
-    (a, b) => new Date(b).getTime() - new Date(a).getTime(),
-  );
+  const dayKeys = Object.keys(grouped).sort((a, b) => {
+    const dateA = new Date(a).getTime();
+    const dateB = new Date(b).getTime();
+    return sort === "oldest" ? dateA - dateB : dateB - dateA;
+  });
 
   return (
     <div className="max-w-5xl mx-auto space-y-0">

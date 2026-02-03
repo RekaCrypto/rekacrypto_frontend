@@ -9,6 +9,8 @@ interface PageProps {
     q?: string;
     coin?: string;
     date?: string;
+    sentiment?: string;
+    sort?: string;
   }>;
 }
 
@@ -20,7 +22,13 @@ export default async function Page({ searchParams }: PageProps) {
       <SearchInput />
       <NewsFilters />
       <Suspense key={JSON.stringify(params)} fallback={<NewsListSkeleton />}>
-        <NewsList search={params.q} coin={params.coin} date={params.date} />
+        <NewsList
+          search={params.q}
+          coin={params.coin}
+          date={params.date}
+          sentiment={params.sentiment}
+          sort={params.sort}
+        />
       </Suspense>
     </div>
   );
