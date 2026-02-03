@@ -57,14 +57,13 @@ export async function fetchCoins(): Promise<CryptoCoin[]> {
 
 export interface FetchCryptoRecapsOptions {
   limit?: number;
-  coinName?: string;
-  dateRange?: DateRange;
+  search?: string;
 }
 
 export async function fetchCryptoRecaps(
   options: FetchCryptoRecapsOptions = {},
 ): Promise<CryptoRecap[]> {
-  const { limit = 50, coinName, dateRange } = options;
+  const { limit = 50, search } = options;
 
   let query = supabase
     .from("crypto_recaps")
@@ -89,37 +88,14 @@ export async function fetchCryptoRecaps(
     .order("created_at", { ascending: false })
     .limit(limit);
 
-  // Filter by coin name if provided
-  // if (coinName) {
-  //   query = query.eq("coin", coinName);
-  // }
-
-  // Filter by date range if provided
-  // if (dateRange) {
-  //   const now = new Date();
-  //   let startDate: Date;
-
-  //   switch (dateRange) {
-  //     case "today":
-  //       startDate = new Date(now.setHours(0, 0, 0, 0));
-  //       break;
-  //     case "week":
-  //       startDate = new Date(now.setDate(now.getDate() - 7));
-  //       break;
-  //     case "month":
-  //       startDate = new Date(now.setMonth(now.getMonth() - 1));
-  //       break;
-  //     case "year":
-  //       startDate = new Date(now.setFullYear(now.getFullYear() - 1));
-  //       break;
-  //   }
-
-  //   query = query.gte("created_at", startDate.toISOString());
-  // }
+  if (search) {
+    const searchTerm = `%${search}%`;
+    query = query.or(
+      `title.ilike.${searchTerm},description.ilike.${searchTerm}`,
+    );
+  }
 
   const { data, error } = await query;
-
-  await new Promise((res) => setTimeout(res, 1000));
 
   if (error) {
     console.error("Error fetching crypto recaps:", error);
