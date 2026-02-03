@@ -58,12 +58,15 @@ export async function fetchCoins(): Promise<CryptoCoin[]> {
 export interface FetchCryptoRecapsOptions {
   limit?: number;
   search?: string;
+  coin?: string;
 }
 
 export async function fetchCryptoRecaps(
   options: FetchCryptoRecapsOptions = {},
 ): Promise<CryptoRecap[]> {
-  const { limit = 50, search } = options;
+  const { limit = 10, search, coin } = options;
+
+  const coinJoin = coin && coin !== "all" ? "!inner" : "";
 
   let query = supabase
     .from("crypto_recaps")
@@ -77,7 +80,7 @@ export async function fetchCryptoRecaps(
       sources,
       created_at,
       updated_at,
-      coin:crypto_coins!crypto_recaps_coin_id_fkey(
+      coin:crypto_coins${coinJoin}!crypto_recaps_coin_id_fkey(
         id,
         shortname,
         name,
@@ -87,6 +90,10 @@ export async function fetchCryptoRecaps(
     )
     .order("created_at", { ascending: false })
     .limit(limit);
+
+  if (coin && coin !== "all") {
+    query = query.ilike("coin.shortname", coin);
+  }
 
   if (search) {
     const searchTerm = `%${search}%`;

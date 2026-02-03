@@ -4,6 +4,8 @@ import Link from "next/link";
 
 interface NewsListProps {
   search?: string;
+  coin?: string;
+  date?: string;
 }
 
 function formatDateLabel(dateString: string): string {
@@ -41,8 +43,8 @@ function groupRecapsByDay(
   );
 }
 
-export default async function NewsList({ search }: NewsListProps) {
-  const recaps = await fetchCryptoRecaps({ search });
+export default async function NewsList({ search, coin, date }: NewsListProps) {
+  const recaps = await fetchCryptoRecaps({ search, coin, date });
 
   if (recaps.length === 0) {
     return (
