@@ -20,16 +20,9 @@ interface CryptoCardProps {
     name: string;
     image_link: string | null;
   };
-  onToggleTracking: (
-    coinId: number,
-    frequency: "daily" | "weekly" | null,
-  ) => Promise<void>;
 }
 
-export default function CryptoCard({
-  coin,
-  onToggleTracking,
-}: CryptoCardProps) {
+export default function CryptoCard({ coin }: CryptoCardProps) {
   const [isTracked, setIsTracked] = useState(false);
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
   const [isPending, startTransition] = useTransition();
@@ -40,7 +33,7 @@ export default function CryptoCard({
 
     startTransition(async () => {
       try {
-        await onToggleTracking(coin.id, newIsTracked ? frequency : null);
+        // await onToggleTracking(coin.id, newIsTracked ? frequency : null);
       } catch (error) {
         // Revert on error
         setIsTracked(!newIsTracked);
@@ -54,7 +47,7 @@ export default function CryptoCard({
     if (isTracked) {
       startTransition(async () => {
         try {
-          await onToggleTracking(coin.id, newFrequency);
+          // await onToggleTracking(coin.id, newFrequency);
         } catch (error) {
           // Revert on error
           setFrequency(frequency);
