@@ -2,22 +2,19 @@ import type { CryptoCoin, CryptoRecap } from "@/lib/supabase";
 import clsx from "clsx";
 import Image from "next/image";
 import ExpandableDescription from "./ExpandableDescription";
+import { NewsImage } from "./NewsImage";
 
 interface NewsCardProps {
   recap: CryptoRecap;
   coin: CryptoCoin;
+  newsId: number;
 }
 
-export default function NewsCard({ recap, coin }: NewsCardProps) {
+export default function NewsCard({ recap, coin, newsId }: NewsCardProps) {
   return (
     <li className="card p-0 list-none overflow-hidden">
       <div className="relative w-full h-48 bg-gradient-to-br from-slate-800 to-slate-900">
-        <Image
-          src="https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1456&q=80"
-          alt="Crypto illustration"
-          fill
-          className="object-cover opacity-60"
-        />
+        <NewsImage newsId={newsId.toString()} />
       </div>
 
       <div className="p-4">

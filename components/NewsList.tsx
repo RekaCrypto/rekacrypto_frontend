@@ -147,7 +147,12 @@ export default async function NewsList({
 
                 <div className="space-y-4 pb-8">
                   {dayRecaps.map((recap) => (
-                    <NewsCard key={recap.id} recap={recap} coin={recap.coin} />
+                    <NewsCard
+                      key={recap.id}
+                      recap={recap}
+                      coin={recap.coin}
+                      newsId={recap.id}
+                    />
                   ))}
                 </div>
               </div>
