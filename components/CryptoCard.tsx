@@ -1,5 +1,8 @@
 "use client";
 
+import { followCoin } from "@/app/actions/follow-coin";
+import { unfollowCoin } from "@/app/actions/unfollow-coin";
+import { UserFollow } from "@/lib/repositories/userFollows";
 import { Star, StarOff } from "lucide-react";
 import Image from "next/image";
 import { useState, useTransition } from "react";
@@ -20,11 +23,14 @@ interface CryptoCardProps {
     name: string;
     image_link: string | null;
   };
+  userFollow: Partial<UserFollow> | undefined;
 }
 
-export default function CryptoCard({ coin }: CryptoCardProps) {
-  const [isTracked, setIsTracked] = useState(false);
-  const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
+export default function CryptoCard({ coin, userFollow }: CryptoCardProps) {
+  const [isTracked, setIsTracked] = useState(!!userFollow);
+  const [frequency, setFrequency] = useState<"daily" | "weekly">(
+    userFollow?.update_frequency || "daily",
+  );
   const [isPending, startTransition] = useTransition();
 
   const handleToggleTracking = () => {
@@ -33,9 +39,12 @@ export default function CryptoCard({ coin }: CryptoCardProps) {
 
     startTransition(async () => {
       try {
-        // await onToggleTracking(coin.id, newIsTracked ? frequency : null);
+        if (newIsTracked) {
+          await followCoin(coin.id, frequency);
+        } else {
+          await unfollowCoin(coin.id);
+        }
       } catch (error) {
-        // Revert on error
         setIsTracked(!newIsTracked);
       }
     });
@@ -47,9 +56,8 @@ export default function CryptoCard({ coin }: CryptoCardProps) {
     if (isTracked) {
       startTransition(async () => {
         try {
-          // await onToggleTracking(coin.id, newFrequency);
+          await followCoin(coin.id, newFrequency);
         } catch (error) {
-          // Revert on error
           setFrequency(frequency);
         }
       });

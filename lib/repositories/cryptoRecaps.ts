@@ -1,4 +1,14 @@
-import { createClient } from "@supabase/supabase-js";
+import { createServerSupabaseClient } from "../supabase/server";
+import { CryptoCoin } from "./coins";
+
+export interface FetchCryptoRecapsOptions {
+  limit?: number;
+  search?: string;
+  coin?: string;
+  date?: string;
+  sentiment?: string;
+  sort?: string;
+}
 
 export type CryptoRecap = {
   id: number;
@@ -12,68 +22,17 @@ export type CryptoRecap = {
   updated_at: string;
 };
 
-export type CryptoCoin = {
-  id: number;
-  shortname: string;
-  name: string;
-  image_link: string | null;
-};
-
-export function getSupabaseServer() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !anonKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    );
-  }
-  return createClient(url, anonKey, {
-    auth: { persistSession: false },
-    global: {
-      headers: {
-        "cache-control": "no-cache",
-      },
-    },
-  });
-}
-
-const supabase = getSupabaseServer();
-
-export type DateRange = "today" | "week" | "month" | "year";
-
-export async function fetchCoins(): Promise<CryptoCoin[]> {
-  const { data, error } = await supabase
-    .from("crypto_coins")
-    .select("id, shortname, name, image_link")
-    .order("shortname", { ascending: true });
-
-  if (error) {
-    console.error("Error fetching coins:", error);
-    throw error;
-  }
-
-  return data || [];
-}
-
-export interface FetchCryptoRecapsOptions {
-  limit?: number;
-  search?: string;
-  coin?: string;
-  date?: string;
-  sentiment?: string;
-  sort?: string;
-}
-
 export async function fetchCryptoRecaps(
   options: FetchCryptoRecapsOptions = {},
 ): Promise<CryptoRecap[]> {
+  const client = await createServerSupabaseClient();
   const { limit = 10, search, coin, date, sentiment, sort } = options;
 
   const coinJoin = coin && coin !== "all" ? "!inner" : "";
 
   const sortAscending = sort === "oldest";
 
-  let query = supabase
+  let query = client
     .from("crypto_recaps")
     .select(
       `

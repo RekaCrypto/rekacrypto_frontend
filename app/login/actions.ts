@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { createClient } from "@/lib/supabase/server";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 const authSchema = z.object({
   email: z.email("Invalid email address"),
@@ -12,7 +12,7 @@ const authSchema = z.object({
 });
 
 export async function login(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createServerSupabaseClient();
 
   const rawData = {
     email: formData.get("email") as string,
@@ -38,7 +38,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = await createClient();
+  const supabase = await createServerSupabaseClient();
 
   const rawData = {
     email: formData.get("email") as string,

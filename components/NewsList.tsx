@@ -1,5 +1,8 @@
 import NewsCard from "@/components/NewsCard";
-import { fetchCryptoRecaps, type CryptoRecap } from "@/lib/supabase";
+import {
+  CryptoRecap,
+  fetchCryptoRecaps,
+} from "@/lib/repositories/cryptoRecaps";
 import Link from "next/link";
 
 interface NewsListProps {

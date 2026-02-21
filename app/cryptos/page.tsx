@@ -15,7 +15,7 @@ export default async function CryptosPage({ searchParams }: PageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            Track Cryptocurrencies
+            Follow Cryptocurrencies
           </h1>
           <p className="text-slate-400">
             Follow your favorite cryptocurrencies and get daily or weekly

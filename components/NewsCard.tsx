@@ -1,4 +1,5 @@
-import type { CryptoCoin, CryptoRecap } from "@/lib/supabase";
+import { CryptoCoin } from "@/lib/repositories/coins";
+import { CryptoRecap } from "@/lib/repositories/cryptoRecaps";
 import clsx from "clsx";
 import Image from "next/image";
 import ExpandableDescription from "./ExpandableDescription";

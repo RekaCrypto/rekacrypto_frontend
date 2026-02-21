@@ -42,7 +42,7 @@ export default function Header() {
                     : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                 }`}
               >
-                Track Cryptos
+                Follow Cryptos
               </Link>
             </nav>
           </div>
