@@ -1,5 +1,6 @@
 import CryptoList from "@/components/CryptoList";
 import CryptoListSkeleton from "@/components/CryptoListSkeleton";
+import ConnectTelegramButton from "@/components/LinkTelegramButton";
 import { Suspense } from "react";
 
 interface PageProps {
@@ -21,6 +22,7 @@ export default async function CryptosPage({ searchParams }: PageProps) {
             Follow your favorite cryptocurrencies and get daily or weekly
             updates
           </p>
+          <ConnectTelegramButton />
         </div>
       </div>
 
